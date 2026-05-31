@@ -1,6 +1,7 @@
 #include "Utils.h"
 
 #include <chrono>
+#include <cctype>
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -36,8 +37,18 @@ int getValidatedInt(std::string prompt) {
     while (true) {
         std::cout << prompt;
         if (std::cin >> value) {
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            return value;
+            std::string remainder;
+            std::getline(std::cin, remainder);
+            bool onlyWhitespace = true;
+            for (char ch : remainder) {
+                if (!std::isspace(static_cast<unsigned char>(ch))) {
+                    onlyWhitespace = false;
+                    break;
+                }
+            }
+            if (onlyWhitespace) return value;
+            std::cout << "Invalid input. Please enter an integer.\n";
+            continue;
         }
         if (std::cin.eof()) {
             return 0;
@@ -53,8 +64,18 @@ double getValidatedDouble(std::string prompt) {
     while (true) {
         std::cout << prompt;
         if (std::cin >> value) {
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            return value;
+            std::string remainder;
+            std::getline(std::cin, remainder);
+            bool onlyWhitespace = true;
+            for (char ch : remainder) {
+                if (!std::isspace(static_cast<unsigned char>(ch))) {
+                    onlyWhitespace = false;
+                    break;
+                }
+            }
+            if (onlyWhitespace) return value;
+            std::cout << "Invalid input. Please enter a number.\n";
+            continue;
         }
         if (std::cin.eof()) {
             return 0.0;

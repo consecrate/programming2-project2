@@ -25,8 +25,14 @@ double RecommendationEngine::calculateScore(const Product& product,
                                             const std::vector<int>& viewedProductIds,
                                             const std::vector<int>& purchasedProductIds,
                                             const ProductManager& productManager) const {
+    return calculateScore(product, viewedProductIds, purchasedProductIds, productManager.getProducts());
+}
+
+double RecommendationEngine::calculateScore(const Product& product,
+                                            const std::vector<int>& viewedProductIds,
+                                            const std::vector<int>& purchasedProductIds,
+                                            const std::vector<Product>& products) const {
     double categoryBonus = 0.0;
-    const std::vector<Product>& products = productManager.getProducts();
 
     if (hasCategoryMatch(product, purchasedProductIds, products)) {
         categoryBonus = 1.5;
@@ -48,14 +54,7 @@ std::vector<Product> RecommendationEngine::recommendTopN(const std::vector<Produ
             continue;
         }
 
-        double categoryBonus = 0.0;
-        if (hasCategoryMatch(product, purchasedProductIds, products)) {
-            categoryBonus = 1.5;
-        } else if (hasCategoryMatch(product, viewedProductIds, products)) {
-            categoryBonus = 0.8;
-        }
-
-        double score = product.getViewCount() * 0.2 + product.getPurchaseCount() * 0.8 + categoryBonus;
+        double score = calculateScore(product, viewedProductIds, purchasedProductIds, products);
         scoredProducts.push_back({product, score});
     }
 

@@ -49,6 +49,13 @@ namespace {
         return nullptr;
     }
 
+    const Admin* findAdminByEmail(const std::vector<Admin>& admins, const std::string& email) {
+        for (const auto& admin : admins) {
+            if (admin.getEmail() == email) return &admin;
+        }
+        return nullptr;
+    }
+
     void registerCustomer(std::vector<Customer>& customers, const std::vector<Admin>& admins) {
         std::string name, email, password;
         std::cout << "Name: ";
@@ -64,6 +71,10 @@ namespace {
         }
         if (findCustomerByEmail(customers, email) != nullptr) {
             std::cout << "A customer with this email already exists.\n";
+            return;
+        }
+        if (findAdminByEmail(admins, email) != nullptr) {
+            std::cout << "A user with this email already exists.\n";
             return;
         }
 

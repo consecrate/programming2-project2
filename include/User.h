@@ -18,6 +18,7 @@ public:
     int getUserId() const;
     std::string getName() const;
     std::string getEmail() const;
+    std::string getPassword() const;
     std::string getRole() const;
     bool checkPassword(std::string inputPassword) const;
 

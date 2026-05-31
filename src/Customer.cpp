@@ -40,7 +40,7 @@ void Customer::showMenu(ProductManager& productManager,
                         OrderManager& orderManager,
                         RecommendationEngine& recommendationEngine,
                         FileManager& fileManager) {
-    static std::vector<Interaction> temporaryInteractions;
+    std::vector<Interaction> temporaryInteractions;
     showMenu(productManager, orderManager, recommendationEngine, fileManager, temporaryInteractions);
 }
 
@@ -163,7 +163,7 @@ void Customer::updateCartQuantity(int productId, int quantity) {
 }
 
 void Customer::checkout(ProductManager& productManager, OrderManager& orderManager) {
-    static std::vector<Interaction> temporaryInteractions;
+    std::vector<Interaction> temporaryInteractions;
     checkout(productManager, orderManager, temporaryInteractions);
 }
 

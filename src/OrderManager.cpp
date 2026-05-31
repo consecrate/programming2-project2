@@ -16,6 +16,10 @@ Order OrderManager::createOrder(int customerId, Cart& cart, ProductManager& prod
         std::cout << "Cannot checkout because cart is empty.\n";
         return Order();
     }
+    if (cart.hasMissingProducts(productManager)) {
+        std::cout << "Cannot checkout because the cart contains unavailable products.\n";
+        return Order();
+    }
 
     for (const auto& cartItem : cart.getItems()) {
         Product* product = productManager.findProductById(cartItem.getProductId());

@@ -4,7 +4,7 @@
 
 The admin side of the system allows an administrator to manage the product catalogue and view system statistics. After logging in with an admin account, the administrator can display all products, add a new product, edit an existing product, delete a product, and open the statistics menu. The admin menu is implemented in the `Admin` class, which inherits from the base `User` class. This supports the OOP requirement for inheritance and role-based behavior.
 
-## Product Management
+## 8. Product Management
 
 Product management is handled by the `ProductManager` class. This class stores a `vector<Product>` and provides methods for searching, adding, editing, deleting, and displaying products. Product IDs are checked before adding a product to prevent duplicates. Editing supports updating the product name, category, price, and stock quantity. Negative prices and negative stock values are rejected.
 

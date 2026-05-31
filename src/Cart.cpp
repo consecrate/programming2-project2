@@ -39,13 +39,36 @@ bool Cart::updateQuantity(int productId, int quantity) {
 
 bool Cart::isEmpty() const { return items.empty(); }
 
+std::vector<int> Cart::getMissingProductIds(const ProductManager& productManager) const {
+    std::vector<int> missingIds;
+    for (const auto& item : items) {
+        if (productManager.findProductById(item.getProductId()) == nullptr) {
+            missingIds.push_back(item.getProductId());
+        }
+    }
+    return missingIds;
+}
+
+bool Cart::hasMissingProducts(const ProductManager& productManager) const {
+    return !getMissingProductIds(productManager).empty();
+}
+
 double Cart::calculateTotal(const ProductManager& productManager) const {
+    auto missingIds = getMissingProductIds(productManager);
+    if (!missingIds.empty()) {
+        std::cout << "Cart contains unavailable product IDs: ";
+        for (size_t i = 0; i < missingIds.size(); ++i) {
+            std::cout << missingIds[i];
+            if (i + 1 < missingIds.size()) std::cout << ", ";
+        }
+        std::cout << ". Total cannot be calculated.\n";
+        return 0.0;
+    }
+
     double total = 0.0;
     for (const auto& item : items) {
         const Product* product = productManager.findProductById(item.getProductId());
-        if (product != nullptr) {
-            total += product->getPrice() * item.getQuantity();
-        }
+        total += product->getPrice() * item.getQuantity();
     }
     return total;
 }
@@ -70,6 +93,12 @@ void Cart::displayCart(const ProductManager& productManager) const {
                       << std::setw(10) << product->getPrice()
                       << std::setw(10) << item.getQuantity()
                       << std::setw(12) << subtotal << '\n';
+        } else {
+            std::cout << std::left << std::setw(6) << item.getProductId()
+                      << std::setw(28) << "[Unavailable product]"
+                      << std::right << std::setw(10) << "-"
+                      << std::setw(10) << item.getQuantity()
+                      << std::setw(12) << "-" << '\n';
         }
     }
     std::cout << "Total: " << std::fixed << std::setprecision(2) << calculateTotal(productManager) << "\n";

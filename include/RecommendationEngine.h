@@ -12,6 +12,10 @@ public:
                           const std::vector<int>& viewedProductIds,
                           const std::vector<int>& purchasedProductIds,
                           const ProductManager& productManager) const;
+    double calculateScore(const Product& product,
+                          const std::vector<int>& viewedProductIds,
+                          const std::vector<int>& purchasedProductIds,
+                          const std::vector<Product>& products) const;
     std::vector<Product> recommendTopN(const std::vector<Product>& products,
                                        const std::vector<int>& viewedProductIds,
                                        const std::vector<int>& purchasedProductIds,

@@ -23,6 +23,61 @@ namespace {
         std::string clean = trim(line);
         return clean.empty() || clean[0] == '#';
     }
+
+    std::string escapeField(const std::string& value) {
+        std::string escaped;
+        for (char ch : value) {
+            if (ch == '\\' || ch == '|' || ch == ';' || ch == ',') {
+                escaped += '\\';
+            }
+            escaped += ch;
+        }
+        return escaped;
+    }
+
+    std::string unescapeField(const std::string& value) {
+        std::string unescaped;
+        for (size_t i = 0; i < value.size(); ++i) {
+            if (value[i] == '\\' && i + 1 < value.size()) {
+                char next = value[i + 1];
+                if (next == '\\' || next == '|' || next == ';' || next == ',') {
+                    unescaped += next;
+                    ++i;
+                } else {
+                    unescaped += value[i];
+                }
+            } else {
+                unescaped += value[i];
+            }
+        }
+        return unescaped;
+    }
+
+    std::vector<std::string> splitEscaped(const std::string& line, char delimiter) {
+        std::vector<std::string> parts;
+        std::string current;
+
+        for (size_t i = 0; i < line.size(); ++i) {
+            char ch = line[i];
+            if (ch == '\\' && i + 1 < line.size()) {
+                char next = line[i + 1];
+                if (next == delimiter || next == '\\') {
+                    current += next;
+                    ++i;
+                } else {
+                    current += ch;
+                }
+            } else if (ch == delimiter) {
+                parts.push_back(trim(current));
+                current.clear();
+            } else {
+                current += ch;
+            }
+        }
+
+        parts.push_back(trim(current));
+        return parts;
+    }
 }
 
 void FileManager::loadProducts(ProductManager& productManager, std::string filename) {
@@ -36,12 +91,12 @@ void FileManager::loadProducts(ProductManager& productManager, std::string filen
     std::string line;
     while (std::getline(file, line)) {
         if (isIgnorableLine(line)) continue;
-        auto parts = split(line, '|');
+        auto parts = splitEscaped(line, '|');
         if (parts.size() < 7) continue;
 
         int id = toInt(parts[0]);
-        std::string name = parts[1];
-        std::string category = parts[2];
+        std::string name = unescapeField(parts[1]);
+        std::string category = unescapeField(parts[2]);
         double price = toDouble(parts[3]);
         int stock = toInt(parts[4]);
         int views = toInt(parts[5]);
@@ -62,8 +117,8 @@ void FileManager::saveProducts(const ProductManager& productManager, std::string
 
     for (const auto& product : productManager.getProducts()) {
         file << product.getId() << '|'
-             << product.getName() << '|'
-             << product.getCategory() << '|'
+             << escapeField(product.getName()) << '|'
+             << escapeField(product.getCategory()) << '|'
              << product.getPrice() << '|'
              << product.getStock() << '|'
              << product.getViewCount() << '|'
@@ -85,14 +140,14 @@ void FileManager::loadUsers(std::vector<Customer>& customers, std::vector<Admin>
     std::string line;
     while (std::getline(file, line)) {
         if (isIgnorableLine(line)) continue;
-        auto parts = split(line, '|');
+        auto parts = splitEscaped(line, '|');
         if (parts.size() < 5) continue;
 
         int userId = toInt(parts[0]);
-        std::string name = parts[1];
-        std::string email = parts[2];
-        std::string password = parts[3];
-        std::string role = parts[4];
+        std::string name = unescapeField(parts[1]);
+        std::string email = unescapeField(parts[2]);
+        std::string password = unescapeField(parts[3]);
+        std::string role = unescapeField(parts[4]);
 
         if (role == "admin") {
             admins.push_back(Admin(userId, name, email, password));
@@ -114,17 +169,17 @@ void FileManager::saveUsers(const std::vector<Customer>& customers, const std::v
 
     for (const auto& customer : customers) {
         file << customer.getUserId() << '|'
-             << customer.getName() << '|'
-             << customer.getEmail() << '|'
-             << customer.getPassword() << '|'
-             << customer.getRole() << '\n';
+             << escapeField(customer.getName()) << '|'
+             << escapeField(customer.getEmail()) << '|'
+             << escapeField(customer.getPassword()) << '|'
+             << escapeField(customer.getRole()) << '\n';
     }
     for (const auto& admin : admins) {
         file << admin.getUserId() << '|'
-             << admin.getName() << '|'
-             << admin.getEmail() << '|'
-             << admin.getPassword() << '|'
-             << admin.getRole() << '\n';
+             << escapeField(admin.getName()) << '|'
+             << escapeField(admin.getEmail()) << '|'
+             << escapeField(admin.getPassword()) << '|'
+             << escapeField(admin.getRole()) << '\n';
     }
 }
 
@@ -137,20 +192,20 @@ void FileManager::loadOrders(OrderManager& orderManager, std::string filename) {
     std::string line;
     while (std::getline(file, line)) {
         if (isIgnorableLine(line)) continue;
-        auto parts = split(line, '|');
+        auto parts = splitEscaped(line, '|');
         if (parts.size() < 5) continue;
 
         int orderId = toInt(parts[0]);
         int customerId = toInt(parts[1]);
-        std::string dateTime = parts[2];
+        std::string dateTime = unescapeField(parts[2]);
         double totalPrice = toDouble(parts[3]);
         std::vector<OrderItem> items;
 
-        auto rawItems = split(parts[4], ';');
+        auto rawItems = splitEscaped(parts[4], ';');
         for (const auto& rawItem : rawItems) {
-            auto itemParts = split(rawItem, ',');
+            auto itemParts = splitEscaped(rawItem, ',');
             if (itemParts.size() < 4) continue;
-            items.push_back(OrderItem(toInt(itemParts[0]), itemParts[1], toDouble(itemParts[2]), toInt(itemParts[3])));
+            items.push_back(OrderItem(toInt(itemParts[0]), unescapeField(itemParts[1]), toDouble(itemParts[2]), toInt(itemParts[3])));
         }
 
         if (orderId > 0) {
@@ -169,13 +224,13 @@ void FileManager::saveOrders(const OrderManager& orderManager, std::string filen
     for (const auto& order : orderManager.getAllOrders()) {
         file << order.getOrderId() << '|'
              << order.getCustomerId() << '|'
-             << order.getDateTime() << '|'
+             << escapeField(order.getDateTime()) << '|'
              << order.getTotalPrice() << '|';
 
         auto items = order.getItems();
         for (size_t i = 0; i < items.size(); ++i) {
             file << items[i].getProductId() << ','
-                 << items[i].getProductName() << ','
+                 << escapeField(items[i].getProductName()) << ','
                  << items[i].getPriceAtPurchase() << ','
                  << items[i].getQuantity();
             if (i + 1 < items.size()) file << ';';
@@ -194,12 +249,12 @@ void FileManager::loadInteractions(std::vector<Interaction>& interactions, std::
     std::string line;
     while (std::getline(file, line)) {
         if (isIgnorableLine(line)) continue;
-        auto parts = split(line, '|');
+        auto parts = splitEscaped(line, '|');
         if (parts.size() < 4) continue;
 
         int customerId = toInt(parts[0]);
         int productId = toInt(parts[1]);
-        std::string type = parts[2];
+        std::string type = unescapeField(parts[2]);
         int count = toInt(parts[3]);
 
         if (customerId > 0 && productId > 0 && count > 0 && (type == "view" || type == "purchase")) {
@@ -218,7 +273,7 @@ void FileManager::saveInteractions(const std::vector<Interaction>& interactions,
     for (const auto& interaction : interactions) {
         file << interaction.getCustomerId() << '|'
              << interaction.getProductId() << '|'
-             << interaction.getType() << '|'
+             << escapeField(interaction.getType()) << '|'
              << interaction.getCount() << '\n';
     }
 }
