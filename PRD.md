@@ -362,7 +362,6 @@ string getName() const;
 string getEmail() const;
 string getRole() const;
 bool checkPassword(string inputPassword) const;
-virtual void showMenu() = 0;
 virtual ~User();
 
 Owner: Shared during skeleton stage, then Josh or HX depending on who starts user login.
