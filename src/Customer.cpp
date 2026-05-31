@@ -154,6 +154,10 @@ void Customer::removeFromCart(int productId) {
 }
 
 void Customer::updateCartQuantity(int productId, int quantity) {
+    if (quantity <= 0) {
+        std::cout << "Quantity must be positive.\n";
+        return;
+    }
     if (cart.updateQuantity(productId, quantity)) std::cout << "Cart updated.\n";
     else std::cout << "Item was not found in cart.\n";
 }
