@@ -37,6 +37,7 @@ public:
     void addToCart(ProductManager& productManager, int productId, int quantity);
     void removeFromCart(int productId);
     void updateCartQuantity(int productId, int quantity);
+    void updateCartQuantity(ProductManager& productManager, int productId, int quantity);
     void checkout(ProductManager& productManager, OrderManager& orderManager);
     void checkout(ProductManager& productManager, OrderManager& orderManager, std::vector<Interaction>& interactions);
     void viewOrderHistory(OrderManager& orderManager) const;

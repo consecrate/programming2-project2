@@ -11,6 +11,16 @@
 #include <iostream>
 
 namespace {
+    int getCartQuantity(const Cart& cart, int productId) {
+        int quantity = 0;
+        for (const auto& item : cart.getItems()) {
+            if (item.getProductId() == productId) {
+                quantity += item.getQuantity();
+            }
+        }
+        return quantity;
+    }
+
     void recordInteraction(std::vector<Interaction>& interactions,
                            int customerId,
                            int productId,
@@ -86,7 +96,7 @@ void Customer::showMenu(ProductManager& productManager,
         } else if (choice == 6) {
             int id = getValidatedInt("Product ID to update: ");
             int quantity = getValidatedInt("New quantity: ");
-            updateCartQuantity(id, quantity);
+            updateCartQuantity(productManager, id, quantity);
         } else if (choice == 7) {
             cart.displayCart(productManager);
         } else if (choice == 8) {
@@ -144,6 +154,12 @@ void Customer::addToCart(ProductManager& productManager, int productId, int quan
         std::cout << "Not enough stock. Available stock: " << product->getStock() << "\n";
         return;
     }
+    int requestedQuantity = getCartQuantity(cart, productId) + quantity;
+    if (requestedQuantity > product->getStock()) {
+        std::cout << "Not enough stock. Already in cart: " << getCartQuantity(cart, productId)
+                  << ". Available stock: " << product->getStock() << "\n";
+        return;
+    }
     cart.addItem(productId, quantity);
     std::cout << "Added to cart.\n";
 }
@@ -160,6 +176,27 @@ void Customer::updateCartQuantity(int productId, int quantity) {
     }
     if (cart.updateQuantity(productId, quantity)) std::cout << "Cart updated.\n";
     else std::cout << "Item was not found in cart.\n";
+}
+
+void Customer::updateCartQuantity(ProductManager& productManager, int productId, int quantity) {
+    Product* product = productManager.findProductById(productId);
+    if (product == nullptr) {
+        std::cout << "Product not found.\n";
+        return;
+    }
+    if (getCartQuantity(cart, productId) == 0) {
+        std::cout << "Item was not found in cart.\n";
+        return;
+    }
+    if (quantity <= 0) {
+        std::cout << "Quantity must be positive.\n";
+        return;
+    }
+    if (quantity > product->getStock()) {
+        std::cout << "Not enough stock. Available stock: " << product->getStock() << "\n";
+        return;
+    }
+    updateCartQuantity(productId, quantity);
 }
 
 void Customer::checkout(ProductManager& productManager, OrderManager& orderManager) {
