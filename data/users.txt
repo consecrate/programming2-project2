@@ -1,0 +1,2 @@
+1|Josh|josh@email.com|1234|customer
+2|Admin|admin@email.com|admin123|admin

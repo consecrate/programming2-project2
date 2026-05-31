@@ -1,0 +1,6 @@
+1|Wireless Mouse|Electronics|15.99|50|12|4
+2|Mechanical Keyboard|Electronics|69.99|20|8|3
+3|Notebook|Stationery|2.5|100|5|10
+4|USB-C Cable|Electronics|7.99|80|20|12
+5|Water Bottle|Lifestyle|9.5|45|7|6
+6|Desk Lamp|Home|24.99|30|10|5
