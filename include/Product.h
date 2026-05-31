@@ -16,6 +16,8 @@ private:
 public:
     Product();
     Product(int id, std::string name, std::string category, double price, int stock);
+    Product(int id, std::string name, std::string category, double price, int stock,
+            int viewCount, int purchaseCount);
 
     int getId() const;
     std::string getName() const;
@@ -29,6 +31,8 @@ public:
     void setCategory(std::string category);
     void setPrice(double price);
     void setStock(int stock);
+    void setViewCount(int viewCount);
+    void setPurchaseCount(int purchaseCount);
 
     void incrementViewCount();
     void incrementPurchaseCount(int quantity);
