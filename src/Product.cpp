@@ -7,12 +7,18 @@ Product::Product()
     : id(0), name(""), category(""), price(0.0), stock(0), viewCount(0), purchaseCount(0) {}
 
 Product::Product(int id, std::string name, std::string category, double price, int stock)
-    : id(id), name(name), category(category), price(price), stock(stock), viewCount(0), purchaseCount(0) {}
+    : id(id), name(name), category(category),
+      price(price >= 0 ? price : 0.0),
+      stock(stock >= 0 ? stock : 0),
+      viewCount(0), purchaseCount(0) {}
 
 Product::Product(int id, std::string name, std::string category, double price, int stock,
                  int viewCount, int purchaseCount)
-    : id(id), name(name), category(category), price(price), stock(stock),
-      viewCount(viewCount), purchaseCount(purchaseCount) {}
+    : id(id), name(name), category(category),
+      price(price >= 0 ? price : 0.0),
+      stock(stock >= 0 ? stock : 0),
+      viewCount(viewCount >= 0 ? viewCount : 0),
+      purchaseCount(purchaseCount >= 0 ? purchaseCount : 0) {}
 
 int Product::getId() const { return id; }
 std::string Product::getName() const { return name; }
